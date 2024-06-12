@@ -1,1 +1,26 @@
-[{"id":"479z","year":"2016","make":"Subaru","model":"WRX"}]
+[
+  {
+    "id": "Wc7TmZ",
+    "year": "2016",
+    "make": "Subaru",
+    "model": "WRX",
+    "price": "27000",
+    "inStock": "No"
+  },
+  {
+    "id": "p8RvNC",
+    "year": "2010",
+    "make": "Honda",
+    "model": "CRV",
+    "price": "20000",
+    "inStock": "No"
+  },
+  {
+    "id": "L0dI5h",
+    "year": "2011",
+    "make": "Honda",
+    "model": "Civic",
+    "price": "20000",
+    "inStock": "No"
+  }
+]

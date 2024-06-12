@@ -1,5 +1,4 @@
 const {readFileSync, writeFileSync} = require("node:fs");
-const {QueueScheduler} = require("rxjs/internal/scheduler/QueueScheduler");
 
 const readJSONFile = (path, fileName) => {
 	const collection = readFileSync(`${path}/${fileName}`, "utf8");
@@ -7,7 +6,7 @@ const readJSONFile = (path, fileName) => {
 }
 
 const writeJSONFile = (path, fileName, data) => {
-	data = JSON.stringify(data);
+	data = JSON.stringify(data, null, 2);
 	return writeFileSync(`${path}/${fileName}`, data, {encoding: "utf8"});
 }
 

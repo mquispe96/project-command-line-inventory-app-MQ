@@ -1,5 +1,12 @@
+// const figlet = require('figlet');
+// const chalk = require('chalk');
+// const inquirer = require('inquirer');
+// const spinners = require('cli-spinners');
+// // const Table = require('cli-table');
+
 const {readJSONFile, writeJSONFile} = require('./src/dataHandler');
-const {create, index, show, destroy, edit} = require('./src/carsControllers');
+const {create, index, show, destroy, edit, filterBy, sortBy	} = require('./src/carsControllers');
+const {createTableDisplay} = require('./src/helperFunctions');
 
 const inform = console.log;
 
@@ -9,6 +16,16 @@ const run = () => {
 	const cars = readJSONFile('./data', "cars.json");
 	let writeToFile = false;
 	let updatedCars = [];
+
+	// figlet('Pursuit Cars !', function(err, data) {
+	// 		if (err) {
+	// 				console.log(chalk.red.bold('Something went wrong...'));
+	// 				console.dir(err);
+	// 				return;
+	// 		}
+	// 		console.log(chalk.blue(data));
+	// });
+
 
 	switch(action){
 		case 'index':
@@ -31,11 +48,21 @@ const run = () => {
 			updatedCars = destroy(cars, car);
 			writeToFile = true;
 			break;
+		case 'filter':
+			const carsFilterView = filterBy(cars, car, process.argv[4]);
+			inform(carsFilterView);
+			break;
+		case 'sort':
+			const carsSortView = sortBy(cars, car, process.argv[4]);
+			inform(carsSortView);
+			break;
 	}
 
 	if (writeToFile) {
 		writeJSONFile("./data", "cars.json", updatedCars);
+		console.log(createTableDisplay(cars))
 	}	
+
 }
 
 run();
