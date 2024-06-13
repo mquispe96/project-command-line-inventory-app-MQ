@@ -1,4 +1,5 @@
-const Table = require('cli-table');
+// const Table = require('cli-table');
+import Table from "cli-table";
 
 const createTableDisplay = cars => {
 	const table = new Table({
@@ -24,6 +25,6 @@ const createTableDisplay = cars => {
 	return table.toString();
 }
 
-module.exports = {
+export {
 	createTableDisplay
 }

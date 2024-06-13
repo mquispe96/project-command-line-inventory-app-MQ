@@ -1,68 +1,58 @@
-// const figlet = require('figlet');
-// const chalk = require('chalk');
 // const inquirer = require('inquirer');
-// const spinners = require('cli-spinners');
-// // const Table = require('cli-table');
+import inquirer from 'inquirer';
 
-const {readJSONFile, writeJSONFile} = require('./src/dataHandler');
-const {create, index, show, destroy, edit, filterBy, sortBy	} = require('./src/carsControllers');
-const {createTableDisplay} = require('./src/helperFunctions');
+import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession} from './src/carsControllers.js';
 
 const inform = console.log;
 
-const run = () => {
-	const action = process.argv[2];
-	const car = process.argv[3];
-	const cars = readJSONFile('./data', "cars.json");
-	let writeToFile = false;
-	let updatedCars = [];
-
-	// figlet('Pursuit Cars !', function(err, data) {
-	// 		if (err) {
-	// 				console.log(chalk.red.bold('Something went wrong...'));
-	// 				console.dir(err);
-	// 				return;
-	// 		}
-	// 		console.log(chalk.blue(data));
-	// });
-
-
-	switch(action){
-		case 'index':
-			const carsView = index(cars);
-			inform(carsView);
-			break;
-		case 'create':
-			updatedCars = create(cars, car);
-			writeToFile = true;
-			break;
-		case 'show':
-			const carView = show(cars, car)
-			inform(carView);
-			break;
-		case 'update':
-			updatedCars = edit(cars, car, process.argv[4]);
-			writeToFile = true;
-			break;
-		case 'destroy':
-			updatedCars = destroy(cars, car);
-			writeToFile = true;
-			break;
-		case 'filter':
-			const carsFilterView = filterBy(cars, car, process.argv[4]);
-			inform(carsFilterView);
-			break;
-		case 'sort':
-			const carsSortView = sortBy(cars, car, process.argv[4]);
-			inform(carsSortView);
-			break;
+const commandsPrompt = [
+	{
+		type: 'list',
+		name: 'command',
+		message: 'What would you like to do?',
+		choices: ['View All Cars', 'View a Car', 'Add a Car', 'Update Car Info', 'Delete a Car', 'Filter Cars', 'Sort Cars']
+	},
+	{
+		type: 'list',
+		name: 'command',
+		message: 'Anything Else?',
+		choices: ['Yes', 'No']
 	}
+]
 
-	if (writeToFile) {
-		writeJSONFile("./data", "cars.json", updatedCars);
-		console.log(createTableDisplay(cars))
-	}	
-
+const perfomAnotherCommand = () => {
+	inquirer.prompt(commandsPrompt[1])
+		.then(ans => ans.command === 'Yes' ? run() : endSession())
 }
 
-run();
+const run = () => {
+	inquirer.prompt(commandsPrompt[0])
+		.then(ans => {
+			const commandChosed = ans.command;
+			switch(commandChosed){
+				case 'View All Cars':
+					index(perfomAnotherCommand);
+					break;
+				case 'View a Car':
+					show(perfomAnotherCommand);
+					break;
+				case 'Add a Car':
+					create(perfomAnotherCommand);
+					break;
+				case 'Update Car Info':
+					editPrompt(perfomAnotherCommand);
+					break;
+				case 'Delete a Car':
+					destroy(perfomAnotherCommand);
+					break;
+				case 'Filter Cars':
+					filterBy(perfomAnotherCommand);
+					break;
+				case 'Sort Cars':
+					sortBy(perfomAnotherCommand);
+					break;
+			}
+		})
+}
+
+startSession(run)

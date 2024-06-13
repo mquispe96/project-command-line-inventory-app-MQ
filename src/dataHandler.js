@@ -1,4 +1,5 @@
-const {readFileSync, writeFileSync} = require("node:fs");
+// const {readFileSync, writeFileSync} = require("node:fs");
+import {readFileSync, writeFileSync} from 'node:fs'
 
 const readJSONFile = (path, fileName) => {
 	const collection = readFileSync(`${path}/${fileName}`, "utf8");
@@ -10,7 +11,7 @@ const writeJSONFile = (path, fileName, data) => {
 	return writeFileSync(`${path}/${fileName}`, data, {encoding: "utf8"});
 }
 
-module.exports = {
+export {
 	readJSONFile,
 	writeJSONFile
 }

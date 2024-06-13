@@ -1,6 +1,6 @@
 [
   {
-    "id": "Wc7TmZ",
+    "id": "tyIg8p",
     "year": "2016",
     "make": "Subaru",
     "model": "WRX",
@@ -8,7 +8,7 @@
     "inStock": "No"
   },
   {
-    "id": "p8RvNC",
+    "id": "RRcPc-",
     "year": "2010",
     "make": "Honda",
     "model": "CRV",
@@ -16,11 +16,27 @@
     "inStock": "No"
   },
   {
-    "id": "L0dI5h",
+    "id": "_7AVZw",
     "year": "2011",
     "make": "Honda",
     "model": "Civic",
     "price": "20000",
     "inStock": "No"
+  },
+  {
+    "id": "xXtOg0",
+    "year": "2024",
+    "make": "Subaru",
+    "model": "WRX",
+    "price": "35000",
+    "inStock": "Yes"
+  },
+  {
+    "id": "ANU3OV",
+    "year": "2024",
+    "make": "Lamborghini",
+    "model": "Huracan",
+    "price": "300000",
+    "inStock": "Yes"
   }
 ]
