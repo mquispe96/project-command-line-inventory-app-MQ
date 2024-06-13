@@ -1,32 +1,28 @@
-// const inquirer = require('inquirer');
 import inquirer from 'inquirer';
 
 import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession} from './src/carsControllers.js';
 
-const inform = console.log;
-
-const commandsPrompt = [
-	{
-		type: 'list',
-		name: 'command',
-		message: 'What would you like to do?',
-		choices: ['View All Cars', 'View a Car', 'Add a Car', 'Update Car Info', 'Delete a Car', 'Filter Cars', 'Sort Cars']
-	},
-	{
-		type: 'list',
-		name: 'command',
-		message: 'Anything Else?',
-		choices: ['Yes', 'No']
-	}
-]
-
 const perfomAnotherCommand = () => {
-	inquirer.prompt(commandsPrompt[1])
+	inquirer.prompt([
+		{
+			type: 'list',
+			name: 'command',
+			message: 'Anything Else?',
+			choices: ['Yes', 'No']
+		}
+	])
 		.then(ans => ans.command === 'Yes' ? run() : endSession())
 }
 
 const run = () => {
-	inquirer.prompt(commandsPrompt[0])
+	inquirer.prompt([
+		{
+			type: 'list',
+			name: 'command',
+			message: 'What would you like to do?',
+			choices: ['View All Cars', 'View a Car', 'Add a Car', 'Update Car Info', 'Delete a Car', 'Filter Cars', 'Sort Cars']
+		}
+	])
 		.then(ans => {
 			const commandChosed = ans.command;
 			switch(commandChosed){

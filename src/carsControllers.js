@@ -1,16 +1,10 @@
-// const {nanoid} = require('nanoid');
-// const figlet = require('figlet');
-// const chalk = require('chalk');
-// const inquirer = require('inquirer');
 import ora from 'ora';
 import { nanoid } from 'nanoid';
 import figlet from 'figlet';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-// const {createTableDisplay} = require('./helperFunctions');
-// const {writeJSONFile, readJSONFile} = require('../src/dataHandler');
-import {createTableDisplay} from './helperFunctions.js';
+import {createTableDisplay, createChoices, formatWords} from './helperFunctions.js';
 import {writeJSONFile, readJSONFile} from '../src/dataHandler.js';
 const cars = readJSONFile('./data', 'cars.json');
 
@@ -23,7 +17,7 @@ const startSession = run => {
 			}
 			console.log(chalk.blue(data));
 	});
-	const spinner = ora('Loading app...').start();
+	const spinner = ora('Loading App...').start();
 	process.stdout.write('\r');
 	setTimeout(() => {
 		process.stdout.write('\r');
@@ -46,7 +40,7 @@ const endSession = () => {
 const inform = console.log;
 
 const index = func => {
-	const spinner = ora('Loading cars data...').start();
+	const spinner = ora('Loading Cars...').start();
 	setTimeout(() => {
 		process.stdout.write('\r');
 		spinner.succeed('Cars Loaded');
@@ -58,25 +52,20 @@ const index = func => {
 const show = func => {
 	inquirer.prompt([
 		{
-			type: 'input',
+			type: 'list',
 			name: 'id',
-			message: 'ID of car you want to see:'
+			message: 'Choose an ID:',
+			choices: createChoices(cars, 'id')
 		}
 	])
 		.then(answer => {
-			const spinner = ora('Loading car data...').start();
+			const spinner = ora('Loading Car...').start();
 			const carInfo = cars.find(car => car.id === answer.id);
 			setTimeout(() => {
 				process.stdout.write('\r');
-				if(carInfo){
-					spinner.succeed('Car Loaded');
-					inform(createTableDisplay([carInfo]));
-					func();
-				}
-				else{
-					spinner.fail('ID did not match any car.');
-					func();
-				}
+				spinner.succeed('Car Loaded');
+				inform(createTableDisplay([carInfo]));
+				func();
 			}, 1500)
 
 		})
@@ -112,19 +101,22 @@ const create = func => {
 	])
 		.then(answers => {
 			const spinner = ora('Processing...').start();
+			for(const key in answers){
+				if(answers[key] === ''){
+					spinner.fail(`All fields are required.`);
+					create(func);
+					return
+				}
+				else if(key !== 'year' || key !== 'price'){
+					answers[key] = formatWords(answers[key]);
+				}
+			}
 			const newCar = {
 				id: nanoid(6),
 				...answers
 			}
 			setTimeout(() => {
 				process.stdout.write('\r');
-				for(const key in answers){
-					if(answers[key] === ''){
-						spinner.fail(`All fields are required.`);
-						func();
-						return
-					}
-				}
 				cars.push(newCar);
 				writeJSONFile('./data', 'cars.json', cars);
 				spinner.succeed('Car successfully added.');
@@ -137,25 +129,19 @@ const create = func => {
 const editPrompt = func => {
 	inquirer.prompt([
 		{
-			type: 'input',
+			type: 'list',
 			name: 'id',
-			message: 'What is the ID of the car:'
+			message: 'Choose an ID:',
+			choices: createChoices(cars, 'id')
 		}
 	])
 		.then(answer => {
-			const spinner = ora('Finding Match...').start();
+			const spinner = ora('Processing...').start();
 			const carIndex = cars.findIndex(car => car.id === answer.id);
 			setTimeout(() => {
+				spinner.stop()
 				process.stdout.write('\r');
-				if(carIndex > -1){
-					spinner.stop()
-					process.stdout.write('\r');
-					editCarInfo(answer.id, carIndex, func);
-				}
-				else{
-					spinner.fail('ID did not match any car.');
-					func();
-				}
+				editCarInfo(answer.id, carIndex, func);
 			}, 1500)
 		})
 }
@@ -213,70 +199,67 @@ const editCarInfo = (id, carIndex, func) => {
 const destroy = func  => {
 	inquirer.prompt([
 		{
-			type: 'input',
+			type: 'list',
 			name: 'id',
-			message: 'What is the ID of the car:'
+			message: 'Choose an ID:',
+			choices: createChoices(cars, 'id')
 		}
 	])
 		.then(answer => {
-			const spinner = ora('Finding Match...').start();
+			const spinner = ora('Processing...').start();
 			const carIndex = cars.findIndex(car => car.id === answer.id);
 			setTimeout(() => {
 				process.stdout.write('\r');
-				if(carIndex > -1){
-					cars.splice(carIndex, 1);
-					writeJSONFile('./data', 'cars.json', cars);
-					spinner.succeed('Car successfully removed from collection.');
-					inform(createTableDisplay(cars));
-					setTimeout(() => func(), 1500);
-				}
-				else{
-					spinner.fail('Car not found. No action taken.');
-					func();
-				}
+				cars.splice(carIndex, 1);
+				writeJSONFile('./data', 'cars.json', cars);
+				spinner.succeed('Car successfully removed.');
+				inform(createTableDisplay(cars));
+				func();
 			}, 1500);
 		})
 }
 		
 const filterBy = func => {
+	let category = undefined;
 	inquirer.prompt([
 		{
 			type: 'list',
 			name: 'category',
 			message: 'Filter by:',
-			choices: ['Year', 'Make', 'Stock']
-		},
-		{
-			type: 'input',
-			name: 'value',
-			message: 'What are you looking for?'
+			choices: ['Year', 'Make', 'In-Stock']
 		}
 	])
-		.then(answers => {
-			const spinner = ora('Processing...').start();
-			const {category, value} = answers;
-			let filteringMatches = [];
-			switch(category){
-				case 'Year':
-					filteringMatches = cars.filter(car => car.year === value);
-					break;
-				case 'Make':
-					filteringMatches = cars.filter(car => car.make.toLowerCase() === value.toLowerCase());
-					break;
-				case 'Stock':
-					filteringMatches = cars.filter(car => car.inStock.toLowerCase() === value.toLowerCase());
-					break;
-			}
-			setTimeout(() => {
-				process.stdout.write('\r');
-				if(!filteringMatches.length){
-					spinner.fail('No matches found.');
-					func();
+		.then(answer => {
+			category = answer.category
+			inquirer.prompt([
+				{
+					type: 'list',
+					name: 'value',
+					message: 'What are you looking for?',
+					choices: createChoices(cars, answer.category)
 				}
-				spinner.succeed('Matches found.');
-				inform(createTableDisplay(filteringMatches));
-				func();
-			}, 1500);
+			])
+				.then(answer => {
+					const spinner = ora('Processing...').start();
+					let filteringMatches = [];
+					switch(category){
+						case 'Year':
+							filteringMatches = cars.filter(car => car.year === answer.value);
+							break;
+						case 'Make':
+							filteringMatches = cars.filter(car => car.make === answer.value);
+							break;
+						case 'In-Stock':
+							filteringMatches = cars.filter(car => car.inStock === answer.value);
+							break;
+					}
+					setTimeout(() => {
+						process.stdout.write('\r');
+						spinner.succeed('Cars filtered.');
+						inform(createTableDisplay(filteringMatches));
+						func();
+					}, 1500);
+				})
 		})
 }
 

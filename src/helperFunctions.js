@@ -1,4 +1,3 @@
-// const Table = require('cli-table');
 import Table from "cli-table";
 
 const createTableDisplay = cars => {
@@ -25,6 +24,44 @@ const createTableDisplay = cars => {
 	return table.toString();
 }
 
+const formatWords = word => word !== '' ? word[0].toUpperCase() + word.slice(1) : '';
+
+const createChoices = (cars, choiceType) => {
+	let choices = [];
+	switch(choiceType){
+		case 'id':
+			choices = cars.reduce((collect, car) => {
+				if(!collect.includes(car.id)){
+					collect.push(car.id);
+				}
+				return collect;
+			}, []);
+			break;
+		case 'Year':
+			choices = cars.reduce((collect, car) => {
+				if(!collect.includes(car.year)){
+					collect.push(car.year);
+				}
+				return collect;
+			}, []);
+			break;
+		case 'Make':
+			choices = cars.reduce((collect, car) => {
+				if(!collect.includes(car.make)){
+					collect.push(car.make);
+				}
+				return collect;
+			}, []);
+			break;
+		case 'In-Stock':
+			choices = ['Yes', 'No']
+				break;
+	}
+	return choices;
+}
+
 export {
-	createTableDisplay
+	createTableDisplay,
+	createChoices,
+	formatWords
 }
