@@ -1,18 +1,20 @@
 import inquirer from 'inquirer';
 
-import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession} from './src/carsControllers.js';
+import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession, compareCars, getInventoryNetWorth} from './src/carsControllers.js';
 
 const perfomAnotherCommand = () => {
 	inquirer.prompt([
 		{
 			type: 'list',
-			name: 'command',
+			name: 'decision',
 			message: 'Anything Else?',
 			choices: ['Yes', 'No']
 		}
 	])
-		.then(ans => ans.command === 'Yes' ? run() : endSession())
+		.then(answer => answer.decision === 'Yes' ? run() : endSession())
 }
+
+const choicesList = ['View All Cars', 'View a Car', 'Inventory\'s Net Worth','Compare Cars','Add a Car', 'Update Car Info', 'Delete Car/s', 'Filter Cars', 'Sort Cars'];
 
 const run = () => {
 	inquirer.prompt([
@@ -20,7 +22,8 @@ const run = () => {
 			type: 'list',
 			name: 'command',
 			message: 'What would you like to do?',
-			choices: ['View All Cars', 'View a Car', 'Add a Car', 'Update Car Info', 'Delete a Car', 'Filter Cars', 'Sort Cars']
+			choices: choicesList,
+			pageSize: choicesList.length
 		}
 	])
 		.then(ans => {
@@ -38,7 +41,7 @@ const run = () => {
 				case 'Update Car Info':
 					editPrompt(perfomAnotherCommand);
 					break;
-				case 'Delete a Car':
+				case 'Delete Car/s':
 					destroy(perfomAnotherCommand);
 					break;
 				case 'Filter Cars':
@@ -46,6 +49,12 @@ const run = () => {
 					break;
 				case 'Sort Cars':
 					sortBy(perfomAnotherCommand);
+					break;
+				case 'Compare Cars':
+					compareCars(perfomAnotherCommand);
+					break;
+					case 'Inventory\'s Net Worth':
+					getInventoryNetWorth(perfomAnotherCommand);
 					break;
 			}
 		})

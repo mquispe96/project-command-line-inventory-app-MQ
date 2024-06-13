@@ -3,7 +3,7 @@ import {readFileSync, writeFileSync} from 'node:fs'
 
 const readJSONFile = (path, fileName) => {
 	const collection = readFileSync(`${path}/${fileName}`, "utf8");
-	return collection ? JSON.parse(collection) : [];
+	return collection.length ? JSON.parse(collection) : [];
 }
 
 const writeJSONFile = (path, fileName, data) => {

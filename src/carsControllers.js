@@ -94,9 +94,10 @@ const create = func => {
 			message: 'Price of the car is:'
 		},
 		{
-			type: 'input',
+			type: 'list',
 			name: 'inStock',
-			message: 'Is car in Stock? Yes/No:'
+			message: 'Is car in Stock?:',
+			choices: ['Yes', 'No']
 		}
 	])
 		.then(answers => {
@@ -104,7 +105,9 @@ const create = func => {
 			for(const key in answers){
 				if(answers[key] === ''){
 					spinner.fail(`All fields are required.`);
-					create(func);
+					setTimeout(() => {
+						create(func);
+					}, 1500);
 					return
 				}
 				else if(key !== 'year' || key !== 'price'){
@@ -169,9 +172,10 @@ const editCarInfo = (id, carIndex, func) => {
 			message: 'Price of the car is:'
 		},
 		{
-			type: 'input',
+			type: 'list',
 			name: 'inStock',
-			message: 'Is car in Stock? Yes/No:'
+			message: 'Is car in Stock?:',
+			choices: ['Yes', 'No', 'No Change']
 		}
 	])
 	.then(answers => {
@@ -183,6 +187,9 @@ const editCarInfo = (id, carIndex, func) => {
 		Object.keys(answers).forEach(key => {
 			if(!answers[key]) {
 				updatedCarInfo[key] = cars[carIndex][key];
+			}
+			if(answers.inStock === 'No Change'){
+				updatedCarInfo.inStock = cars[carIndex].inStock;
 			}
 		})
 		cars.splice(carIndex, 1, updatedCarInfo);
@@ -196,31 +203,45 @@ const editCarInfo = (id, carIndex, func) => {
 	})
 }
 
-const destroy = func  => {
+const destroy = (func, selectedIDs = [])  => {
+	const opts = cars.filter(car => !selectedIDs.includes(car.id));
 	inquirer.prompt([
 		{
 			type: 'list',
 			name: 'id',
 			message: 'Choose an ID:',
-			choices: createChoices(cars, 'id')
+			choices: createChoices(opts, 'id')
+		},
+		{
+			type: 'confirm',
+			name: 'continue',
+			message: 'Delete another car?',
+			default: true
 		}
 	])
-		.then(answer => {
-			const spinner = ora('Processing...').start();
-			const carIndex = cars.findIndex(car => car.id === answer.id);
-			setTimeout(() => {
-				process.stdout.write('\r');
-				cars.splice(carIndex, 1);
-				writeJSONFile('./data', 'cars.json', cars);
-				spinner.succeed('Car successfully removed.');
-				inform(createTableDisplay(cars));
-				func();
-			}, 1500);
+		.then(answers => {
+			selectedIDs.push(answers.id);
+			if(answers.continue){
+				destroy(func, selectedIDs);
+			}
+			else{
+				const spinner = ora('Processing...').start();
+				selectedIDs.forEach(id => {
+					const carIndex = cars.findIndex(car => car.id === id);
+					cars.splice(carIndex, 1);
+				})
+				setTimeout(() => {
+					process.stdout.write('\r');
+					writeJSONFile('./data', 'cars.json', cars);
+					spinner.succeed('Car/s successfully removed.');
+					inform(createTableDisplay(cars));
+					func();
+				}, 1500);
+			}
 		})
 }
 		
 const filterBy = func => {
-	let category = undefined;
 	inquirer.prompt([
 		{
 			type: 'list',
@@ -230,13 +251,13 @@ const filterBy = func => {
 		}
 	])
 		.then(answer => {
-			category = answer.category
+			const category = answer.category
 			inquirer.prompt([
 				{
 					type: 'list',
 					name: 'value',
 					message: 'What are you looking for?',
-					choices: createChoices(cars, answer.category)
+					choices: createChoices(cars, category)
 				}
 			])
 				.then(answer => {
@@ -315,6 +336,71 @@ const sortBy = func => {
 		})
 }
 
+const compareCars = (func, selectedIDs = []) => {
+	const opts = cars.filter(car => !selectedIDs.includes(car.id));
+	if(selectedIDs.length < 1){
+		inquirer.prompt([
+			{
+				type: 'list',
+				name: 'id',
+				message: 'Choose car ID:',
+				choices: createChoices(opts, 'id')
+			}
+		])
+			.then(answer => {
+				selectedIDs.push(answer.id);
+				compareCars(func, selectedIDs)
+			})
+	}
+	else{
+		inquirer.prompt([
+			{
+				type: 'list',
+				name: 'id',
+				message: 'Choose car ID:',
+				choices: createChoices(opts, 'id')
+			},{
+				type: 'confirm',
+				name: 'continue',
+				message: 'Do you want to add another car?',
+				default: true
+			}
+		])
+			.then(answers => {
+				selectedIDs.push(answers.id);
+				if(answers.continue && selectedIDs.length !== cars.length){
+					compareCars(func, selectedIDs);
+				}
+				else {
+					let spinner = undefined;
+					if(answers.continue){
+						spinner = ora('All cars were chosen, processing...').start()
+					}
+					else{
+						spinner = ora('Processing...').start();
+					}
+					const selectedCarsInfo = cars.filter(car => selectedIDs.includes(car.id));
+					setTimeout(() => {
+						process.stdout.write('\r');
+						spinner.succeed('Comparison Ready.');
+						inform(createTableDisplay(selectedCarsInfo));
+						func();
+					}, 1500);
+				}
+			})
+	}
+}
+
+const getInventoryNetWorth = func => {
+	const spinner = ora('Calculating Inventory\'s Net Worth...').start();
+	setTimeout(() => {
+		const netWorth = cars.reduce((total, car) => total + Number(car.price),0);
+		process.stdout.write('\r');
+		spinner.succeed(`The Inventory's Net Worth is: $${netWorth}`);
+		func();
+	}, 1500);
+}
+
 export {
 	startSession,
 	endSession,
@@ -324,6 +410,7 @@ export {
 	editPrompt,
 	destroy,
 	filterBy,
-	sortBy
+	sortBy,
+	compareCars,
+	getInventoryNetWorth
 }
-
