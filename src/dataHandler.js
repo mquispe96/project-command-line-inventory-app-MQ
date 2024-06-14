@@ -1,4 +1,3 @@
-// const {readFileSync, writeFileSync} = require("node:fs");
 import {readFileSync, writeFileSync} from 'node:fs'
 
 const readJSONFile = (path, fileName) => {
