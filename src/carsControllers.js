@@ -247,7 +247,7 @@ const filterBy = func => {
 			type: 'list',
 			name: 'category',
 			message: 'Filter by:',
-			choices: ['Year', 'Make', 'In-Stock']
+			choices: ['Year', 'Make', 'Stock']
 		}
 	])
 		.then(answer => {

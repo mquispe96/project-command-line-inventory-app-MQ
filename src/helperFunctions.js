@@ -53,7 +53,7 @@ const createChoices = (cars, choiceType) => {
 				return collect;
 			}, []);
 			break;
-		case 'In-Stock':
+		case 'Stock':
 			choices = ['Yes', 'No']
 				break;
 	}

@@ -53,9 +53,9 @@ const run = () => {
 				case 'Compare Cars':
 					compareCars(perfomAnotherCommand);
 					break;
-					case 'Inventory\'s Net Worth':
-					getInventoryNetWorth(perfomAnotherCommand);
-					break;
+				case 'Inventory\'s Net Worth':
+				getInventoryNetWorth(perfomAnotherCommand);
+				break;
 			}
 		})
 }
