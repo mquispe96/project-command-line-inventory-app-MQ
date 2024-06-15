@@ -1,20 +1,33 @@
 import inquirer from 'inquirer';
 
-import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession, compareCars, getInventoryNetWorth} from './src/carsControllers.js';
+import {create, index, show, destroy, editPrompt, filterBy, sortBy, startSession, endSession, compareCars, getInventoryNetWorth, addToCart, removeFromCart, seeCart} from './src/carsControllers.js';
 
 const perfomAnotherCommand = () => {
 	inquirer.prompt([
 		{
 			type: 'list',
 			name: 'decision',
-			message: 'Anything Else?',
+			message: 'Would you like to do something else?',
 			choices: ['Yes', 'No']
 		}
 	])
 		.then(answer => answer.decision === 'Yes' ? run() : endSession())
 }
 
-const choicesList = ['View All Cars', 'View a Car', 'Inventory\'s Net Worth','Compare Cars','Add a Car', 'Update Car Info', 'Delete Car/s', 'Filter Cars', 'Sort Cars'];
+const choicesList = [
+	'View All Cars',
+	'View a Car',
+	'Inventory\'s Net Worth',
+	'Compare Cars',
+	'Filter Cars',
+	'Sort Cars',
+	'Add Car to Inventory',
+	'Update Car Info',
+	'Delete Car/s from Inventory',
+	'Add Car/s to Cart',
+	'See Cart',
+	'Remove Car/s from Cart'
+]
 
 const run = () => {
 	inquirer.prompt([
@@ -35,13 +48,13 @@ const run = () => {
 				case 'View a Car':
 					show(perfomAnotherCommand);
 					break;
-				case 'Add a Car':
+				case 'Add Car to Inventory':
 					create(perfomAnotherCommand);
 					break;
 				case 'Update Car Info':
 					editPrompt(perfomAnotherCommand);
 					break;
-				case 'Delete Car/s':
+				case 'Delete Car/s from Inventory':
 					destroy(perfomAnotherCommand);
 					break;
 				case 'Filter Cars':
@@ -54,8 +67,17 @@ const run = () => {
 					compareCars(perfomAnotherCommand);
 					break;
 				case 'Inventory\'s Net Worth':
-				getInventoryNetWorth(perfomAnotherCommand);
-				break;
+					getInventoryNetWorth(perfomAnotherCommand);
+					break;
+				case 'Add Car/s to Cart':
+					addToCart(perfomAnotherCommand);
+					break;
+				case 'See Cart':
+					seeCart(perfomAnotherCommand);
+					break;
+				case 'Remove Car/s from Cart':
+					removeFromCart(perfomAnotherCommand);
+					break;
 			}
 		})
 }
