@@ -4,11 +4,11 @@
 
 [
   {
-    "id": "FRIBao",
-    "year": "2016",
-    "make": "Subaru",
-    "model": "WRX",
-    "price": "26000",
-    "inStock": "No"
-  }
-]
+    id: 'FRIBao',
+    year: '2016',
+    make: 'Subaru',
+    model: 'WRX',
+    price: '26000',
+    inStock: 'No',
+  },
+];

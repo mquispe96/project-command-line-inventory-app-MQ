@@ -1,6 +1,5 @@
 # Pursuit Cars Inventory - Command Line Application Project
 
-
 ## Project Description
 
 A command line application to navigate and edit/view all the cars in the inventory. With the help of the Filing System library from Nodejs, user is able to write and read a JSON file, where all cars are stored.
